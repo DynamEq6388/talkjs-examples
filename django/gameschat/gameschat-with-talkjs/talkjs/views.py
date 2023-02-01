@@ -74,15 +74,20 @@ def create_talkjs_chat(request):
         synchronize_talkjs_participants(participantsIds, is_group)
 
         conversationId = 'chat_' + ''.join(random.choices(string.digits, k=5))
-        url, data = get_request_prerequisites(f'/conversations/{conversationId}', {
-            'participants': participantsIds,
-            'subject': request.POST['subject'],
-            'welcomeMessages': [request.POST['welcomeMessage']] if request.POST['welcomeMessage'] else None,
-            'photoUrl': request.POST['photoUrl'] if request.POST['photoUrl'] else None
-        })
+        url, data = get_request_prerequisites(
+            f'/conversations/{conversationId}',
+            {
+                'participants': participantsIds,
+                'subject': request.POST['subject'],
+                'welcomeMessages': [request.POST['welcomeMessage']]
+                if request.POST['welcomeMessage']
+                else None,
+                'photoUrl': request.POST['photoUrl'] or None,
+            },
+        )
 
         response = requests.put(url, data=data, headers=headers)
-        
+
         if response.ok:
             message = f'This is a group chat with {participants_count} more people!' if is_group else 'This is a private chat!' 
             send_talkjs_system_message(message, conversationId)
@@ -157,14 +162,10 @@ def get_talkjs_user_object(user):
 def get_request_prerequisites(endpoint, data=None):
     url = f'{talkjs_base_url}{endpoint}'
 
-    if data is None:
-        return url
-    return url, json.dumps(data)
+    return url if data is None else (url, json.dumps(data))
 
 def get_response_result(response):
-    if response.ok:
-        return ok_request()
-    return bad_request()
+    return ok_request() if response.ok else bad_request()
 
 def bad_request():
     return HttpResponse(status=400)

@@ -9,9 +9,7 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 def can_perform_action(user, owner):
-    if user == owner:
-        return True
-    return False
+    return user == owner
 
 class ConversationsListView(LoginRequiredMixin, ListView):
     model = Conversation
@@ -29,7 +27,7 @@ class ConversationsListView(LoginRequiredMixin, ListView):
 
         if not context['conversations']:
             context['conversations'] = {}
-            messages.warning(self.request, f'There are no conversations at the moment...')
+            messages.warning(self.request, 'There are no conversations at the moment...')
 
         return context
 
