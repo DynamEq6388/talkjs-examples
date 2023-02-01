@@ -49,7 +49,7 @@ def profile(request):
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
-            messages.success(request, f'Your account has been updated!')
+            messages.success(request, 'Your account has been updated!')
             return redirect('profile')
     else:
         user_form = UserUpdateForm(instance=request.user)
@@ -72,14 +72,15 @@ def inbox(request):
 
 @login_required
 def chat(request):
-    users_with_status = []
     users = User.objects.all().exclude(id__in=[request.user.id])
 
-    for user in users:
-        users_with_status.append({
+    users_with_status = [
+        {
             'id': user.id,
             'username': user.username,
-            'is_online': user.profile.is_online
-        })
+            'is_online': user.profile.is_online,
+        }
+        for user in users
+    ]
     return render(request, 'users/chat.html', { 'users': users_with_status })
 

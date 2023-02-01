@@ -6,9 +6,7 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 def can_perform_action(user, owner):
-    if user == owner:
-        return True
-    return False
+    return user == owner
 
 class GamesListView(ListView):
     model = Game
@@ -22,7 +20,7 @@ class GamesListView(ListView):
 
         if not context['games']:
             context['games'] = {}
-            messages.warning(self.request, f'There are no games at the moment...')
+            messages.warning(self.request, 'There are no games at the moment...')
 
         return context
 
